@@ -6,17 +6,19 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 
 namespace GradeBook.GradeBooks
 {
-    public class BaseGradeBook
+    public abstract class BaseGradeBook
     {
         public string Name { get; set; }
         public List<Student> Students { get; set; }
         public GradeBookType Type { get; set; }
-
-        public BaseGradeBook(string name)
+        public bool IsWeighted { get; set; }
+        public BaseGradeBook(string name, bool isWeight)
         {
+            IsWeighted = isWeight;
             Name = name;
             Students = new List<Student>();
         }
@@ -107,20 +109,43 @@ namespace GradeBook.GradeBooks
 
         public virtual double GetGPA(char letterGrade, StudentType studentType)
         {
-            switch (letterGrade)
+            if (studentType != StudentType.Standard)
             {
-                case 'A':
-                    return 4;
-                case 'B':
-                    return 3;
-                case 'C':
-                    return 2;
-                case 'D':
-                    return 1;
-                case 'F':
-                    return 0;
+                switch (letterGrade)
+                {
+
+                    case 'A':
+                        return 5;
+                    case 'B':
+                        return 3;
+                    case 'C':
+                        return 2;
+                    case 'D':
+                        return 2;
+                    case 'F':
+                        return 1;
+                }
+                return 0;
+            }
+            else
+            {
+                switch (letterGrade)
+                {
+
+                    case 'A':
+                        return 4;
+                    case 'B':
+                        return 3;
+                    case 'C':
+                        return 2;
+                    case 'D':
+                        return 1;
+                    case 'F':
+                        return 0;
+                }
             }
             return 0;
+        
         }
 
         public virtual void CalculateStatistics()
@@ -219,6 +244,7 @@ namespace GradeBook.GradeBooks
                 return 'F';
         }
 
+
         /// <summary>
         ///     Converts json to the appropriate gradebook type.
         ///     Note: This method contains code that is not recommended practice.
@@ -268,6 +294,7 @@ namespace GradeBook.GradeBooks
             return JsonConvert.DeserializeObject(json, gradebook);
         }
         }
-
     
+
+
 }
